@@ -4,6 +4,7 @@ namespace App\Exceptions;
 
 use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Auth\AuthenticationException;
 
 class Handler extends ExceptionHandler
 {
@@ -46,6 +47,26 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        // it redirects to the right login page
+        // default -> it always goes back to the 
+        // user login page instead of admin login
+
+        // render method that is responsible for converting 
+        // a given exception into an HTTP response
+        // Catch AthenticationException 
+        // and redirect back to somewhere else...
+        if($exception instanceof AuthenticationException){
+            $guard = array_get($exception->guards(), 0);
+            switch($guard){
+                case 'admin':
+                    return redirect(route('admin.login'));
+                    break;
+                default:
+                    return redirect(route('login'));
+                    break;
+            }
+        }
+
         return parent::render($request, $exception);
     }
 }
