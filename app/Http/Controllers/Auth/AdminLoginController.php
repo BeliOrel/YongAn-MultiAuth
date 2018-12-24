@@ -24,7 +24,9 @@ class AdminLoginController extends Controller
     public function __construct()
     {
         // only employers can access this controller
-        $this->middleware('guest:admin');
+        // logout function should be accessable 
+        // when you're loged out (obviously!)
+        $this->middleware('guest:admin', ['except' => ['logout']]);
     }
     public function showLoginForm() {
         return view('auth.admin-login');
@@ -50,5 +52,20 @@ class AdminLoginController extends Controller
         // if not successful, then redirect back 
         // to the login with the form data
         return redirect()->back()->withInput($request->only('email', 'remember'));
+    }
+
+    /**
+     * Log the user out of the application.
+     */
+    public function logout()
+    {
+        Auth::guard('admin')->logout();
+
+        // if you want to log out all at once
+        // if you're already logged in as user and admin
+        // $request->session()->invalidate();
+        // return $this->loggedOut($request) ?: redirect('/');
+
+        return redirect('/');
     }
 }
